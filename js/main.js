@@ -8,7 +8,7 @@ var markers = []
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
-  initMap(); // added 
+  initMap(); // added
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -78,7 +78,7 @@ initMap = () => {
         scrollWheelZoom: false
       });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: '<your MAPBOX API KEY HERE>',
+    mapboxToken: 'pk.eyJ1IjoidGFuaWEyOTAxIiwiYSI6ImNqaHM4eDVoajAwZ2szdm52cGh4M2N2cXoifQ.QSVjJtCx60VTqf3c4T_hMA',
     maxZoom: 18,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -161,9 +161,10 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = restaurant.name + ' restaurant promotional';
   li.append(image);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h3');
   name.innerHTML = restaurant.name;
   li.append(name);
 
@@ -175,9 +176,14 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   li.append(address);
 
-  const more = document.createElement('a');
+  const more = document.createElement('button');
   more.innerHTML = 'View Details';
-  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('aria-label', 'View Details of ' + restaurant.name);
+  more.onclick = function() {
+    const url = DBHelper.urlForRestaurant(restaurant);
+    window.location = url;
+  }
+
   li.append(more)
 
   return li
@@ -197,7 +203,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 
-} 
+}
 /* addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
@@ -209,3 +215,11 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 } */
 
+/* Sets up service worker */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").then(function(reg) {
+    console.log("Service worker registered");
+  }).catch(function(error) {
+    console.log("Service worker registration failed " + error);
+  });
+}
